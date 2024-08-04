@@ -1,0 +1,185 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        .error {
+            border-color: red;
+        }
+    </style>
+</head>
+<body>
+<div class="text-center">
+    <h1 class="display-4">Generate Data</h1>
+</div>
+    <div class="row justify-content-center m-3">
+        <div class="col-sm-8">
+        <div class="card">
+                <label>Input N Generate</label>
+                <input type="number" id="N" name="N" value="" class="form-control">
+                <span id="error-message" style="color: red; display: none;">Masukan Tipe Data Integer</span>
+            <table id="dataTable" border="3">
+                <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>
+                                Nama (Varchar 25)
+                                Random String
+                            </th>
+                            <th>
+                                Gender (int)
+                                1: Pria, 2: Wanita
+                            </th>
+                            <th>
+                                Hobi Char (1)
+                                A. Sebak Bola
+                                B. Badminton
+                                C. Tennis
+                                D. Renang
+                                E. Bersepeda
+                            </th>
+                            <th>
+                                Umur (int)
+                                Range dari
+                                18 - 40
+                            </th>
+                        </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+            <div>
+                <button id="generateBtn" class="btn btn-primary">Generate Data</button>
+                <button id="submitBtn" class="btn btn-primary" disabled>Submit</button>
+            </div>
+        </div>
+    </div>
+    </div>
+
+<script>
+        const alphabets = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        let latestId = 0;
+        $(document).ready(function () {
+            let nValue = 0;
+            var parsedValue = 0;
+            $('#N').on('input', function () {
+                nValue = $(this).val();
+                parsedValue = parseInt(nValue, 10);
+
+                if (isNaN(parsedValue)) {
+                    $(this).addClass('error');
+                    $('#error-message').show();
+                } else {
+                    $(this).removeClass('error');
+                    $('#error-message').hide();
+                }
+            });
+            $('#generateBtn').click(function () {
+                let gender = [];
+                let hobi = [];
+                $.when(
+                    $.getJSON('@Url.Action("GetGender")', function (data) {
+                        gender = data;
+                    }),
+                    $.getJSON('@Url.Action("GetHobi")', function (data) {
+                        hobi = data;
+                    })
+                ).then(function () {
+                    if (gender.length > 0 && hobi.length > 0) {
+                        $.ajax({
+                            type: "GET",
+                            url: '@Url.Action("GetLatestId")',
+                            success: function (response) {
+                                if (latestId === 0) {
+                                    latestId = response.latestId;
+                                }
+
+                                let data = [];
+                                for (let i = 0; i < parsedValue; i++) {
+                                    data.push({
+                                        Id: latestId + i + 1,
+                                        Nama: makeid(7).toString(),
+                                        IdGender: Math.floor(Math.random() * gender.length) + 1,
+                                        IdHobi: alphabets[Math.floor(Math.random() * hobi.length)],
+                                        Umur: Math.floor(Math.random() * (40 - 18 + 1)) + 18
+                                    });
+                                }
+
+                                latestId += parsedValue;
+
+                                let tableBody = $('#dataTable tbody');
+                                $.each(data, function (index, item) {
+                                    tableBody.append(`<tr>
+                                                <td class="text-center">${item.Id}</td>
+                                                <td class="text-center">${item.Nama}</td>
+                                                <td class="text-center">${item.IdGender}</td>
+                                                <td class="text-center">${item.IdHobi}</td>
+                                                <td class="text-center">${item.Umur}</td>
+                                            </tr>`);
+                                });
+                                if (data.length >= 1000) {
+                                    $('#submitBtn').prop('disabled', false);
+                                }
+                            }
+                        })
+                    }
+                });
+            });
+
+            $('#submitBtn').click(function () {
+                let dataSubmit = [];
+                $('#dataTable tbody tr').each(function () {
+                    let row = $(this);
+                    let item = {
+                        Id: parseInt(row.find('td:eq(0)').text()),
+                        Nama: row.find('td:eq(1)').text(),
+                        IdGender: parseInt(row.find('td:eq(2)').text()),
+                        IdHobi: row.find('td:eq(3)').text(),
+                        Umur: parseInt(row.find('td:eq(4)').text())
+                    };
+                    dataSubmit.push(item);
+                });
+
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("SubmitData")',
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(dataSubmit),
+                    success: function (response) {
+                        if (response.success) {
+                            alert('Data berhasil disimpan!');
+                        }
+                        else {
+                            alert('Data gagal disimpan!');
+                        }
+                    }
+                });
+            });
+
+            function makeid(length) {
+                let result = '';
+                const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                const charactersLength = characters.length;
+                let counter = 0;
+                while (counter < length) {
+                    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+                    counter += 1;
+                }
+                return result;
+            }
+        });
+</script>
+</body>
+<footer class="border-top footer text-muted">
+    <div class="container">
+        &copy; 2024 - WebAppRen - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    </div>
+</footer>
+</html>
