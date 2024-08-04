@@ -30,6 +30,21 @@ namespace WebAppRen.Controllers
             return View();
         }
 
+        public IActionResult One()
+        {
+            return View();
+        }
+
+        public IActionResult Thousand()
+        {
+            return View();
+        }
+
+        public IActionResult Custom()
+        {
+            return View();
+        }
+
         [HttpGet]
         public IActionResult GetLatestId()
         {

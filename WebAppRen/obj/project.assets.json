@@ -4776,11 +4776,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Net Core\\02082024\\WebAppRen\\WebAppRen.csproj",
+      "projectUniqueName": "C:\\Net Core\\02082024\\GenerateDataASPNET\\WebAppRen\\WebAppRen.csproj",
       "projectName": "WebAppRen",
-      "projectPath": "C:\\Net Core\\02082024\\WebAppRen\\WebAppRen.csproj",
+      "projectPath": "C:\\Net Core\\02082024\\GenerateDataASPNET\\WebAppRen\\WebAppRen.csproj",
       "packagesPath": "C:\\Users\\LENOVO\\.nuget\\packages\\",
-      "outputPath": "C:\\Net Core\\02082024\\WebAppRen\\obj\\",
+      "outputPath": "C:\\Net Core\\02082024\\GenerateDataASPNET\\WebAppRen\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
